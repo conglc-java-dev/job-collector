@@ -1,7 +1,7 @@
 // n8n Code node
 // Mode: Run Once for All Items
 // Input: từng job item sau node Filter/Rank
-// Output: 1 item duy nhất để gửi 1 email tổng hợp
+// Output: 1 item duy nhất để gửi 1 email digest ngắn gọn
 
 const jobs = $input.all().map(item => item.json);
 
@@ -68,16 +68,6 @@ function formatSalary(job) {
   return 'Không rõ';
 }
 
-function truncate(value, maxLength = 1600) {
-  const text = clean(value);
-  if (text.length <= maxLength) return text;
-  return `${text.slice(0, maxLength).trim()}...`;
-}
-
-function getDescription(job) {
-  return job.description || job.requirements || job.benefits || 'Không có nội dung';
-}
-
 const sortedJobs = [...jobs].sort((a, b) => {
   const scoreA = Number(a.jobScore);
   const scoreB = Number(b.jobScore);
@@ -90,6 +80,14 @@ const sortedJobs = [...jobs].sort((a, b) => {
   return dateB - dateA;
 });
 
+function pickReasons(job) {
+  if (!Array.isArray(job.matchReasons)) return '';
+  return job.matchReasons
+    .filter(reason => !reason.startsWith('-'))
+    .slice(0, 4)
+    .join('; ');
+}
+
 const content = sortedJobs.length === 0
   ? 'Không có job phù hợp trong lần quét này.'
   : sortedJobs.map((job, index) => {
@@ -98,39 +96,20 @@ const content = sortedJobs.length === 0
       const source = formatValue(job.source, 'Không rõ nguồn');
       const location = formatValue(job.location, 'Không rõ địa điểm');
       const level = formatValue(job.level, 'Không rõ level');
-      const workModel = formatValue(job.workModel, 'Không rõ hình thức');
-      const employmentType = formatValue(job.employmentType, 'Không rõ loại việc');
       const skills = formatValue(job.skills, 'Không rõ skill');
       const score = Number.isFinite(Number(job.jobScore)) ? Number(job.jobScore) : null;
-      const reasons = Array.isArray(job.matchReasons) && job.matchReasons.length > 0
-        ? job.matchReasons.slice(0, 8).join('; ')
-        : 'Không có';
+      const reasons = pickReasons(job);
+      const url = formatValue(job.url, 'Không có link');
 
       return `
-==============================
-JOB #${index + 1}${score !== null ? ` | Score: ${score}` : ''}
-
-Title: ${title}
-Công ty: ${company}
-Nguồn: ${source}
-Địa điểm: ${location}
-Level: ${level}
-Kinh nghiệm: ${formatExperience(job)}
-Lương: ${formatSalary(job)}
-Hình thức: ${workModel} | ${employmentType}
-Ngày đăng: ${formatDate(job.postedAt || job.time)}
-Hết hạn: ${formatDate(job.expiresAt)}
-Skills: ${skills}
-
-Lý do match:
-${reasons}
-
-Nội dung:
-${truncate(getDescription(job))}
-
-Link:
-${formatValue(job.url, 'Không có link')}
-==============================
+${index + 1}. ${title}${score !== null ? ` (${score} điểm)` : ''}
+   Công ty: ${company}
+   Địa điểm: ${location}
+   KN: ${formatExperience(job)} | Level: ${level} | Lương: ${formatSalary(job)}
+   Skills: ${skills}
+   Nguồn: ${source} | Đăng: ${formatDate(job.postedAt || job.time)}
+   Match: ${reasons || 'Không có'}
+   Link: ${url}
 `.trim();
     }).join('\n\n');
 
