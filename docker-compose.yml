@@ -1,0 +1,25 @@
+services:
+  collector:
+    build: .
+    container_name: job-collector-api
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      REQUEST_TIMEOUT_MS: 20000
+      REQUEST_DELAY_MS: 500
+      MAX_PAGES: 3
+      MAX_JOBS: 50
+      TOPCV_COOKIE: ${TOPCV_COOKIE:-}
+    restart: unless-stopped
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: job-collector-n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+volumes:
+  n8n_data:
