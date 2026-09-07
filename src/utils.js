@@ -33,10 +33,10 @@ export function slugify(value) {
 export function parseExperience(text = '') {
   const normalized = cleanText(text).toLowerCase();
   const patterns = [
+    /(?:từ\s*)?(\d+(?:[.,]\d+)?)\s*(?:-|–|đến|to)\s*(\d+(?:[.,]\d+)?)\s*(?:năm|years?)/i,
     /(?:từ|tối thiểu|ít nhất|at least|minimum|min\.?|>=)\s*(\d+(?:[.,]\d+)?)\s*(?:năm|years?)/i,
     /(\d+(?:[.,]\d+)?)\s*(?:\+|năm trở lên|years? or more)/i,
     /(?:kinh nghiệm[^\n.]{0,50}?|experience[^\n.]{0,50}?)(\d+(?:[.,]\d+)?)\s*(?:năm|years?)/i,
-    /(\d+(?:[.,]\d+)?)\s*(?:-|–|đến|to)\s*(\d+(?:[.,]\d+)?)\s*(?:năm|years?)/i,
     /^(\d+(?:[.,]\d+)?)\s*(?:năm|years?)$/i
   ];
   for (const pattern of patterns) {

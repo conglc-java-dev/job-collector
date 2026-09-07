@@ -1,6 +1,6 @@
 # Job Collector cho n8n
 
-API lấy và chuẩn hóa việc làm từ **ITviec, TopCV, VietnamWorks và TopDev**. Kết quả có description, requirements, kỹ năng, lương và số năm kinh nghiệm đã suy luận. Một nguồn lỗi không làm hỏng dữ liệu của nguồn còn lại.
+API lấy và chuẩn hóa việc làm từ **ITviec, TopCV, VietnamWorks, TopDev, CareerViet, Vieclam24h, Glints và JobsGO**. Kết quả có description, requirements, kỹ năng, lương và số năm kinh nghiệm đã suy luận. Một nguồn lỗi không làm hỏng dữ liệu của nguồn còn lại.
 
 ## Chạy bằng Docker
 
@@ -12,7 +12,7 @@ curl http://localhost:3000/health
 API mặc định:
 
 ```bash
-curl "http://localhost:3000/jobs?keyword=java&location=ha-noi&sources=itviec,topcv,vietnamworks,topdev&pages=1&limit=20"
+curl "http://localhost:3000/jobs?keyword=java&location=ha-noi&sources=itviec,topcv,vietnamworks,topdev,careerviet,vieclam24h,glints,jobsgo&pages=1&limit=20"
 ```
 
 Hoặc POST (thuận tiện cho n8n):
@@ -20,7 +20,7 @@ Hoặc POST (thuận tiện cho n8n):
 ```bash
 curl -X POST http://localhost:3000/collect \
   -H 'Content-Type: application/json' \
-  -d '{"keyword":"java","location":"ha-noi","sources":["itviec","topcv","vietnamworks","topdev"],"pages":1,"limit":20}'
+  -d '{"keyword":"java","location":"ha-noi","sources":["itviec","topcv","vietnamworks","topdev","careerviet","vieclam24h","glints","jobsgo"],"pages":1,"limit":20}'
 ```
 
 `limit` là tổng số job tối đa và collector lấy xen kẽ giữa các nguồn. `candidateExperienceYears` là tùy chọn; nên để node filter/ranking chung trong n8n xử lý nếu bạn còn ghép dữ liệu Apify.
@@ -77,7 +77,11 @@ Trong HTTP Request:
 - Method: `POST`
 - URL khi n8n chạy trong compose này: `http://collector:3000/collect`
 - Send Body: JSON
-- Body: `{"keyword":"java","location":"ha-noi","sources":["itviec","topcv","vietnamworks","topdev"],"pages":1,"limit":20}`
+- Body: `{"keyword":"java","location":"ha-noi","sources":["itviec","topcv","vietnamworks","topdev","careerviet","vieclam24h","glints","jobsgo"],"pages":1,"limit":20}`
+
+## Lưu ý Glints và JobsGO
+
+Hai website này đang dùng WAF/Cloudflare và có thể chặn request từ server. Collector vẫn cô lập lỗi theo từng nguồn, nên các nguồn còn lại tiếp tục trả dữ liệu. Nếu server của bạn bị chặn, lấy cookie từ request hợp lệ trong trình duyệt và đặt vào biến môi trường `GLINTS_COOKIE` hoặc `JOBSGO_COOKIE`. Không commit các giá trị cookie vào Git.
 
 Ở node **Split Out**, chọn field `jobs`. Cấu hình node **Merge** là `Append` để mỗi job của hai nhánh vẫn là một n8n item riêng trước khi đi qua filter.
 

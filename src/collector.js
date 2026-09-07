@@ -2,13 +2,21 @@ import { listItviec, detailItviec } from './sources/itviec.js';
 import { listTopcv, detailTopcv } from './sources/topcv.js';
 import { listVietnamworks, detailVietnamworks } from './sources/vietnamworks.js';
 import { listTopdev, detailTopdev } from './sources/topdev.js';
+import { listCareerviet, detailCareerviet } from './sources/careerviet.js';
+import { listVieclam24h, detailVieclam24h } from './sources/vieclam24h.js';
+import { listGlints, detailGlints } from './sources/glints.js';
+import { listJobsgo, detailJobsgo } from './sources/jobsgo.js';
 import { sleep } from './utils.js';
 
 const adapters = {
   itviec: { list: listItviec, detail: detailItviec },
   topcv: { list: listTopcv, detail: detailTopcv },
   vietnamworks: { list: listVietnamworks, detail: detailVietnamworks, throttleDetails: true },
-  topdev: { list: listTopdev, detail: detailTopdev }
+  topdev: { list: listTopdev, detail: detailTopdev },
+  careerviet: { list: listCareerviet, detail: detailCareerviet },
+  vieclam24h: { list: listVieclam24h, detail: detailVieclam24h },
+  glints: { list: listGlints, detail: detailGlints },
+  jobsgo: { list: listJobsgo, detail: detailJobsgo }
 };
 
 const EMPTY_EXPERIENCE = { raw: null, minYears: null, maxYears: null };
@@ -51,7 +59,9 @@ export async function collect(input = {}) {
   const pages = positiveInt(input.pages, 1, Number(process.env.MAX_PAGES || 3));
   const limit = positiveInt(input.limit, 20, Number(process.env.MAX_JOBS || 50));
   const delay = Math.max(0, Number(process.env.REQUEST_DELAY_MS || 500));
-  const requestedSources = Array.isArray(input.sources) ? input.sources : String(input.sources || 'itviec,topcv,vietnamworks,topdev').split(',');
+  const requestedSources = Array.isArray(input.sources)
+    ? input.sources
+    : String(input.sources || 'itviec,topcv,vietnamworks,topdev,careerviet,vieclam24h,glints,jobsgo').split(',');
   const sources = requestedSources.map((item) => item.trim().toLowerCase()).filter((item) => adapters[item]);
   const jobs = [];
   const errors = [];

@@ -11,6 +11,8 @@ services:
       MAX_PAGES: 3
       MAX_JOBS: 50
       TOPCV_COOKIE: ${TOPCV_COOKIE:-}
+      GLINTS_COOKIE: ${GLINTS_COOKIE:-}
+      JOBSGO_COOKIE: ${JOBSGO_COOKIE:-}
     restart: unless-stopped
 
   n8n:

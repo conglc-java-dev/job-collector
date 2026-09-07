@@ -12,6 +12,7 @@ test('extracts minimum years of experience', () => {
   assert.deepEqual(parseExperience('Yêu cầu từ 3 năm kinh nghiệm Java'), { raw: 'từ 3 năm', minYears: 3, maxYears: null });
   assert.deepEqual(parseExperience('Tối thiểu 04 năm kinh nghiệm Spring Boot'), { raw: 'tối thiểu 04 năm', minYears: 4, maxYears: null });
   assert.deepEqual(parseExperience('Không yêu cầu kinh nghiệm'), { raw: 'Không yêu cầu kinh nghiệm', minYears: 0, maxYears: 0 });
+  assert.deepEqual(parseExperience('Kinh nghiệm làm việc: từ 01 đến 02 năm'), { raw: 'từ 01 đến 02 năm', minYears: 1, maxYears: 2 });
 });
 
 test('removes tracking parameters from a job URL', () => {
